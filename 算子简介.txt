@@ -1,0 +1,1238 @@
+*进行灰度转换
+rgb1_to_gray (Image2026080614554431121, GrayImage)
+
+*进行阈值分割
+threshold (GrayImage, Regions, 255, 255)
+
+*进行打散
+connection (Regions, ConnectedRegions)
+
+*进行特征提取
+select_shape (ConnectedRegions, SelectedRegions, 'area', 'and', 600.96, 481370)
+
+*提取边缘轮廓
+gen_contour_region_xld (SelectedRegions, Contours, 'border')
+
+*提取出特定的区域
+reduce_domain (Image, SelectedRegions1, ImageReduced)
+
+*进行色彩增强
+emphasize (ImageReduced, ImageEmphasize, 7, 7, 1)
+
+*最大化面积提取出白色区域
+binary_threshold (ImageEmphasize, Region, 'max_separability', 'dark', UsedThreshold)
+
+*获取区域个数
+count_obj (Contours, Number)
+
+*在区域中显示文本信息 可以利用for循环的方式，也可以直接使用数组的方式   缩放无影响，会一直显示14:38 2026/9/2
+方式1：for循环
+dev_disp_text (Column[i]+'\r\n'+Row[i], 'image', Row[i], Column[i], 'red', [], [])
+方式2：数组
+dev_disp_text ('x='+Column+'\n'+'y='+Row, 'image', Row, Column, 'black', [], [])
+
+*获取中心点坐标 _xld针对轮廓求中心
+area_center_xld (Contours, Area, Row, Column, PointOrder)
+*获取中心点坐标
+area_center (SelectedRegions1, Area, Row, Column)
+
+*亚像素边缘轮廓连接
+union_adjacent_contours_xld (, UnionContours, 10, 1, 'attr_keep')
+union_collinear_contours_xld：共线连接
+*让轮廓闭环
+union2_closed_contours_xld (, , ContoursUnion)
+
+*生成箭头
+gen_arrow_contour_xld (Arrow, 100, 110, 200, 200, 5, 8)
+
+*绘制圆
+dev_get_window (WindowHandle)
+dev_set_draw ('margin')
+draw_circle (WindowHandle, Row, Column, Radius)
+gen_circle (Circle, Row, Column, Radius)
+
+*绘制标准矩形
+draw_rectangle1 (WindowHandle, Row1, Column1, Row2, Column2)
+gen_rectangle1 (Rectangle, Row1, Column1, Row2, Column2)
+
+*绘制标准椭圆
+draw_ellipse (WindowHandle, Row3, Column3, Phi, Radius1, Radius2)
+gen_ellipse (Ellipse, Row3, Column3, Phi, Radius1, Radius2)
+
+*绘制任意一条线段
+draw_region (Region, WindowHandle)
+
+
+*绘制直线  交互式算子，需要再屏幕上手动绘制
+draw_line (WindowHandle, Row11, Column11, Row21, Column21)
+*这里可以直接用两个点直接生成
+gen_region_line (RegionLines, Row11, Column11, Row21, Column21)
+*生成直线 根据得到的两个点坐标，绘制一条线
+disp_line (WindowHandle, circlerow[0], circlecol[0], circlerow[1], circlecol[1])
+生成更加平滑的直接
+gen_contour_polygon_xld (Contour, [circlerow[0], circlerow[1]], [circlecol[0], circlecol[1]])
+
+
+*绘制任意一块不封闭区域
+draw_polygon (PolygonRegion, WindowHandle)
+
+*由点生成多边形轮廓
+get_region_points (RegionLines, Rows1, Columns1)
+gen_contour_polygon_xld (Contour, Rows1, Columns1)
+
+*生成更加平滑的轮廓
+gen_polygons_xld (Contour, Polygons, 'ramer', 2)
+
+*生成一个平滑的轮廓
+smooth_contours_xld (Contour, SmoothedContours, 999)
+
+*绘制点
+draw_point (WindowHandle, Row4, Column4)
+gen_circle (Circle, Row4, Column4, 1)
+
+*区域反选 也就是求补集
+complement (Circle, RegionComplement)
+
+*求交集
+intersection (Circle1, Circle2, RegionIntersection)
+
+*减去相交的区域，第一个区域-第二个区域相交的区域  求补集
+ difference (Circle2, Circle1, RegionDifference)
+
+*求交集的补集
+symm_difference (Circle2, Circle1, RegionDifference1)
+
+*填充区域，找到整体
+fill_up (Regions, RegionFillUp)
+
+*将图像的每一个字符都转为矩形
+dilation_rectangle1 (SelectedRegions, RegionDilation, 5, 5)
+
+
+* 找到面积最大的区域
+select_shape_std (SelectedRegions, SelectedRegions1, 'max_area', 70)
+
+*获取选定区域的坐标数据，左上，右下
+smallest_rectangle1 (SelectedRegions1, Row1, Column1, Row2, Column2)
+
+*由点生成出去
+gen_region_points (Region, [100,100,100,100,100], [100,101,102,103,104])
+
+*获取区域上面所有的点
+get_region_points (Region, Rows, Columns)
+
+*蒋首尾两个点连接成一条线
+gen_region_line (RegionLines, 10,10, 200, 500)
+
+*根据直线的起点和终点坐标，计算出直线的重心点坐标，长度，弧度
+line_position (10,10, 200, 500, RowCenter, ColCenter, Length, Phi)
+
+*将弧度转为角度
+tuple_deg (Phi, Deg)
+
+*计算直线的角度  90°到-90°
+line_orientation (RowBegin, ColBegin, RowEnd, ColEnd, Phi3)
+tuple_deg (Phi3, Deg3)
+
+*以标准矩形裁切  区域裁切
+crop_rectangle1 (Image, ImagePart, 476, 320, 743, 583)
+
+*以仿射矩形区域裁切  带角度的 中心点坐标   弧度  裁切的区域的大小  精度
+dev_get_window (WindowHandle)
+draw_rectangle2 (WindowHandle, Row, Column, Phi, Length1, Length2)
+crop_rectangle2 (ImagePart, ImagePart1, 300, 200, rad(45), 100, 20, 'true', 'constant')
+
+*点到点之间的距离
+draw_point (WindowHandle, Row1, Column1)
+gen_circle (Circle, Row, Column, 1)
+draw_point (WindowHandle, Row2, Column2)
+gen_circle (Circle1, Row, Column, 1)
+
+*获取两点之间的距离
+distance_pp (Row1, Column1, Row2, Column2, Distance)
+
+*计算轮廓到轮廓之间的距离  只能计算平行关系的线段 第三个参数标识计算的精度
+distance_cc (Contours, Contours1, 'point_to_point', DistanceMin2, DistanceMax2)
+
+*设置颜色
+dev_set_color ('red')
+
+*将两点连接
+gen_region_line (RegionLines, Row1, Column1, Row2, Column2)
+
+*获取直线的基本信息 中心 长度 角度
+line_position (Row2, Column2, Distance, Distance, RowCenter, ColCenter, Length, Phi1)
+
+*设置字体大小和类型
+set_font(WindowHandle, '宋体-Bold-26')
+
+*显示文本信息
+dev_disp_text (Distance, 'image', RowCenter, ColCenter, 'blue', 'box', 'false')
+
+dev_open_window：打开一个新的图形窗口，并返回其句柄。
+
+dev_get_window：获取当前活动图形窗口的句柄
+
+
+*计算轮廓的角度
+fit_line_contour_xld (SmoothedContours, 'tukey', -1, 0, 5, 2, RowBegin, ColBegin, RowEnd, ColEnd, Nr, Nc, Dist)
+
+*线段到线段之间的距离  *线段到线段的最小距离和最大距离
+distance_ss (Row11, Column11, Row21, Column21, Row12, Column12, Row22, Column22, DistanceMin, DistanceMax)
+
+*求轮廓的角度
+orientation_xld (SmoothedContours, Phi1)
+
+*将弧度转为角度
+tuple_deg (Nr, Deg1)
+
+*求区域的角度  得到的是弧度
+orientation_region (RegionLines, Phi2)
+tuple_deg (Phi2, Deg2)
+
+*生成标记出选定点的坐标 把坐标位置❌️叉出来·
+gen_cross_contour_xld (Cross, [Row1,Row2], [Column1,Column2], 16, 0.785398)
+
+*裁剪出指定区域的大小的图片
+crop_rectangle1 (Image, ImagePart, Row1, Column1, Row2, Column2)
+
+*二进制阈值分割  最大化分割出暗的部分  当前景和背景颜色差异较大的时候使用
+binary_threshold (ImageEmphasize, Region, 'max_separability', 'dark', UsedThreshold)
+
+*区域平移
+move_region (RegionDifference, RegionMoved, Row1, Column1)
+
+ *累加合并
+concat_obj (EmptyRegion, RegionMoved, EmptyRegion)
+
+*将多个区域合并成一个算子
+union1 (SelectedRegions1, RegionUnion)
+
+*将区域排序  从左到右排序  true是正排序，false是反排序 
+sort_region (RegionUnion, SortedRegions, 'character', 'true', Column)
+
+#将边缘轮廓进行切割
+segment_contours_xld (Contours1, ContoursSplit, 'lines', 5, 4, 2)
+#将区域转换为轮廓
+gen_contour_region_xld (SelectedRegions, Contours, 'border')
+#将轮廓转为更加平滑的轮廓
+gen_polygons_xld (Contours, Polygons, 'ramer', 4)
+
+#获取多边形拐点坐标
+get_polygon_xld (Polygons, Row, Col, Length, Phi)
+
+#显示拐点坐标  
+#挑选出拐点坐标
+tuple_select_range (Row, 1, 4, y)
+tuple_select_range (Col, 1, 4, x)
+
+*将区域排序 'character'：排序模式，严格按“从左到右，从上到下”的阅读顺序排列。
+sort_region (SelectedRegions, SortedRegions, 'character', 'true', 'row')
+
+*图像相减
+sub_image (ImageResult, ImageResult, ImageSub, 1, 128)
+
+
+*图像想除
+div_image (ImageSub, ImageSub, ImageResult1, 255, 0)
+
+*剪切局部区域，类似放大局部的效果
+crop_part (ImageSub, ImagePart, 100, 100, 128, 128)
+
+*统计区域的个数
+count_obj (SortedRegions, Number)
+
+*找出选出的区域
+select_obj (SortedRegions, first, 1)
+select_obj (SortedRegions, last, Number)
+
+*将两个区域合并成一个区域
+union2 (first, last, RegionUnion)
+
+*均值滤波  
+mean_image (GrayImage, ImageMean, 59, 59)
+
+*用圆图减均值图，得到差值图  图像相减
+dyn_threshold (Image, ImageMean, RegionDynThresh, 12, 'light')
+
+*图形转换，转换成圆  形状转换
+shape_trans (SelectedRegions, RegionTrans, 'outer_circle')
+
+*旋转图片  90是角度
+rotate_image (ImagePart1, ImageRotate, 90, 'constant')
+
+*图片镜像
+mirror_image (ImageRotate, ImageMirror, 'column')
+
+*生成网格 10, 10网格之间的距，'lines'以线的形式512, 512网格的大小
+gen_grid_region (RegionGrid, 10, 10, 'lines', 512, 512)
+
+*对数变换  压缩高亮区域，拉伸暗区域  用于处理过亮的情况  整体效果都变亮了
+* log_image (Image, LogImage, 'e')
+
+*指数变换  让亮的更亮，暗的更暗
+* exp_image (Image, ExpImage, 'e')
+
+*幂律变换  根据第三个参数，<1是对数变换 >1是指数变换
+* pow_image (Image, PowImage, 2)  
+
+*求灰度值的绝对值
+abs_image (Image, ImageAbs)
+*把像素灰度值均衡话 ，处理光线不均匀的图像
+
+*提取边缘轮廓
+edges_sub_pix (ImageReduced, Edges, 'canny', 1, 20, 40)
+
+
+*区域镜像  第三个参数是镜像的参数row垂直镜像   512离对称轴的距离，两个物体之间的距离
+mirror_region (RegionLines3, RegionMirror, 'row', 512)
+
+*发生位置偏移，平移区域
+move_region (RegionTrans, RegionMoved, 0, -5)
+
+*生成区域的轮廓  区域转轮廓
+gen_contour_region_xld (RegionMoved, Contours, 'border')2
+
+*中值滤波 去毛躁
+median_image (Dd58fb4ba2f8dedbc5ff3ce826f861be, ImageMedian, 'circle', 1, 'mirrored')
+
+*整体拉伸灰度值
+scale_image_max (Image, ImageScaleMax)
+
+* 灰度腐蚀：用矩形结构元素（5x5）对图像腐蚀，取邻域最小值，图像变暗，消除亮斑
+gray_erosion_rect (Image, ImageErosion, 5, 5)
+
+* 灰度腐蚀：用自定义结构元素进行灰度腐蚀，可指定任意形状
+gray_erosion (Image, ImageErosion, StructElement)
+
+* 灰度腐蚀：用预定义菱形结构元素，对角方向腐蚀较弱，保留斜边
+gray_erosion_shape (Image, ImageErosion, 5, 5, 'diamond')
+
+* 灰度膨胀：用矩形结构元素膨胀，取邻域最大值，图像变亮，填充暗缝
+gray_dilation_rect (Image, ImageDilation, 5, 5)
+
+* 灰度开运算：先腐蚀后膨胀，去除比结构元素小的亮细节，整体亮度不变
+gray_opening (Image, ImageOpening, StructElement)
+
+* 灰度闭运算：先膨胀后腐蚀，填充比结构元素小的暗孔洞，整体亮度不变
+gray_closing (Image, ImageClosing, StructElement)
+
+
+* 生成一个圆形结构元素，半径为5.5像素
+gen_circle (StructElement, 0, 0, 5.5)
+* 使用自定义结构元素进行腐蚀
+erosion1 (Region, StructElement, RegionErosion)
+
+*开运算  先腐蚀后膨胀
+opening_rectangle1 (RegionTrans, RegionOpening, 10, 1)
+
+*开运算，先腐蚀后膨胀，将毛刺取出
+opening_circle (SelectedRegions1, RegionOpening, 6.5)
+
+*设置轮廓线条粗细
+dev_set_line_width (5)
+
+*膨胀
+dilation_circle (SelectedRegions, RegionDilation, 3.5)
+
+*通道分解  拆分成三个通道
+decompose3 (Image75b6c2e001b0e98ee7fbdc1ac9a57149, r, g, b)
+
+*转为hsv色彩空间  进行色彩增强
+trans_from_rgb (r, g, b, vr, vg, vb, 'hsv')
+
+*顶帽运算 提取更亮的部分
+gray_tophat(Image, SE, ImageTopHat)
+*底帽预算 ，提取更暗的部分
+gray_bothat (, , ImageBotHat)
+
+*获取选定区域每一个像素点的坐标
+get_region_points (Rectangle, Rows, Columns)
+
+*获取某个区域的中的灰度值，可以是一个点的区域的灰度值
+get_grayval (r, Rows, Columns, Grayval)
+
+*计算平均灰度值
+tuple_mean (Grayval, Mean)
+
+*图像的均值滤波  消除噪声  同时也是图像更加模糊
+mean_image (Image, ImageMean, 9, 9)
+
+*图像的中值滤波 可以消除图像中的异常的灰度值
+median_image (ImageMean, ImageMedian, 'circle', 1, 'mirrored')
+
+*高斯滤波  可以消除图像中的椒盐噪声
+gauss_filter (ImageMedian, ImageGauss, 5)
+
+*如果光照不均匀，是灰度值均匀
+illuminate (ImageGauss, ImageIlluminate, 101, 101, 0.7)
+
+*双边滤波 可以消除背景上的杂点
+bilateral_filter (ImageIlluminate, ImageIlluminate, ImageBilateral, 3, 20, [], [])
+
+*图像融合 0.5*2+0
+add_image (ImageBilateral, ImageBilateral, ImageResult, 0.5, 0)
+
+
+*-----------------------------------------------------------------------------分类器的使用流程-----------------------------------------------------------------
+
+read_image (Image75b6c2e001b0e98ee7fbdc1ac9a57149, 'C:/Users/20765/Documents/xwechat_files/wxid_5b9qqkumh82m22_989d/temp/RWTemp/2026-08/90978d5e3881637c552155a997350c7b/75b6c2e001b0e98ee7fbdc1ac9a57149.jpg')
+
+*获取图像尺寸
+get_image_size (Image75b6c2e001b0e98ee7fbdc1ac9a57149, Width, Height)
+dev_display (Image75b6c2e001b0e98ee7fbdc1ac9a57149)
+dev_get_window (WindowHandle)
+*创建五个数组，用于存储每一个颜色特征的三个通道 的三个平均灰度值和三个标准差
+Feature_Black:=[]
+Feature_Brown:=[]
+Feature_Red:=[]
+Feature_Orange:=[]
+Feature_Yellow:=[]
+
+*统计每一个颜色的特征
+for index := 0 to 4 by 1
+    dev_display (Image75b6c2e001b0e98ee7fbdc1ac9a57149)
+    *绘制特征提取区域
+    draw_rectangle1 (WindowHandle, Row1, Column1, Row2, Column2)
+    gen_rectangle1 (Rectangle, Row1, Column1, Row2, Column2)
+    *对提取区域进行色彩分离以及色彩转换到hsv进行色彩增强
+    decompose3 (Image75b6c2e001b0e98ee7fbdc1ac9a57149, r, g, b)
+    trans_from_rgb (r, g, b, Hr, Hg, Hb, 'hsv')
+    
+    *计算区域的颜色特征的平均值和标准差 分别需要计算三个通道
+    intensity (Rectangle, Hr, MeanHr, DeviationHr)
+    intensity (Rectangle, Hg, MeanHg, DeviationHg)
+    intensity (Rectangle, Hb, MeanHb, DeviationHb)
+    
+    *将计算出来的数据存入数组
+    if(index==0)
+        Feature_Black:=[MeanHr,MeanHg,MeanHb,DeviationHr, DeviationHg, DeviationHb]
+    endif
+    if(index==1)
+        Feature_Brown:=[MeanHr,MeanHg,MeanHb,DeviationHr, DeviationHg, DeviationHb]
+    endif
+    if(index==2)
+        Feature_Red:=[MeanHr,MeanHg,MeanHb,DeviationHr, DeviationHg, DeviationHb]
+    endif
+    if(index==3)
+        Feature_Orange:=[MeanHr,MeanHg,MeanHb,DeviationHr, DeviationHg, DeviationHb]
+    endif
+    if(index==4)
+        Feature_Yellow:=[MeanHr,MeanHg,MeanHb,DeviationHr, DeviationHg, DeviationHb]
+    endif
+
+endfor
+
+*创建分类器 三个通道的颜色平均值和三个通道的标准差 第一个参数：几种特征类型 第二个：隐藏特征，通常是第一个2倍 第三个：识别的类型有几个
+create_class_mlp (6, 10, 5, 'softmax', 'normalization', 10, 42, MLPHandle)
+
+*将提取的赝本数据添加到分类器中
+add_sample_class_mlp (MLPHandle, Feature_Black, 0)
+add_sample_class_mlp (MLPHandle, Feature_Brown, 1)
+add_sample_class_mlp (MLPHandle, Feature_Red, 2)
+add_sample_class_mlp (MLPHandle, Feature_Orange, 3)
+add_sample_class_mlp (MLPHandle, Feature_Yellow, 4)
+
+*开始训练
+*训练分类器
+train_class_mlp (MLPHandle, 1000, 1, 0.01, Error, ErrorLog)
+dev_set_color ('yellow')
+disp_message (WindowHandle, '训练_错误Error = ', 'window', 12, 12, 'black', 'true')
+
+*进行测试，选择一个区域进行颜色检测
+while(true)
+    dev_display (Image75b6c2e001b0e98ee7fbdc1ac9a57149)
+    *绘制一个矩形区域
+    draw_rectangle1 (WindowHandle, Row11, Column11, Row21, Column21)
+    gen_rectangle1 (Rectangle1, Row11, Column11, Row21, Column21)
+    
+    *色彩分离以及颜色增强
+    decompose3 (Image75b6c2e001b0e98ee7fbdc1ac9a57149, r, g, b)
+    trans_from_rgb (r, g, b, h, s, v, 'hsv')
+    dev_display (Image75b6c2e001b0e98ee7fbdc1ac9a57149)
+    *颜色特征提取
+    intensity (Rectangle1, h, MeanH, DeviationH)
+    intensity (Rectangle1, s, MeanS, DeviationS)
+    intensity (Rectangle1, v, MeanV, DeviationV)
+    
+    *将数据存放进行数组
+    Feature_Test:=[MeanH, MeanS,MeanV, DeviationH ,DeviationS,DeviationV]
+    
+    *调用分类器开始识别
+    classify_class_mlp (MLPHandle, Feature_Test, 1, ClassID, Confidence)
+    
+    *根据分类器返回的Id，进行颜色判断
+    if(ClassID==0 and Confidence>0.8)
+        Result := '黑色'
+    elseif(ClassID==1 and Confidence>0.8)
+        Result := '棕色'
+    elseif(ClassID==2 and Confidence>0.8)
+       Result := '红色'
+    elseif(ClassID==3 and Confidence>0.8)
+       Result := '橙色'
+    elseif(ClassID==4 and Confidence>0.8)
+        Result := '黄色'
+    else 
+        Result := '无法识别'
+endif
+*显示得到的结果文本
+dev_disp_text (Result, 'image', Row11, Column11, 'red', [], [])
+endwhile
+
+*清理使用资源
+clear_class_mlp (MLPHandle)
+dev_update_on ()
+*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#图像旋转
+rotate_image (GrayImage, ImageRotate, 90, 'constant')
+
+#设置边框
+dev_set_draw ('margin')
+
+#创建条码模版
+create_bar_code_model ([], [], BarCodeHandle)
+
+#寻找图像中的条码
+find_bar_code (ImageRotate, SymbolRegions, BarCodeHandle, 'auto', DecodedDataStrings)
+
+#显示条码信息
+area_center (SymbolRegions, Area, Row, Column)
+dev_disp_text (DecodedDataStrings, 'image', Row, Column, 'black', [], [])
+
+#进行仿射变换  就是对区域进行平移旋转缩放
+#创建一个单位仿射变换矩阵
+hom_mat2d_identity (HomMat2DIdentity)
+
+#设置平移矩阵  向右平移100个单位
+hom_mat2d_translate (HomMat2DIdentity, 0, 100, HomMat2DTranslate)
+
+#执行平移矩阵
+affine_trans_region (Rectangle, RegionAffineTrans, HomMat2DTranslate, 'nearest_neighbor')
+
+
+* Image Acquisition 01: Code generated by Image Acquisition 01
+open_framegrabber ('MVision(2)', 1, 1, 0, 0, 0, 0, 'progressive', 8, 'default', -1, 'false', 'auto', '0', 0, -1, AcqHandle)
+grab_image_start (AcqHandle, -1)
+
+read_shape_model ('C:/Users/20765/Desktop/1.shm/2.shm', ModelID)
+while (true)
+    grab_image_async (Image, AcqHandle, -1)
+    
+* #提取边缘
+*     edges_sub_pix (Image, Edges, 'canny', 1, 50, 80)
+*     select_shape_xld (Edges, SelectedXLD, 'contlength', 'and', 1000, 99999)
+-----------------------------------------------------------------------------------------
+					模板匹配流程
+抓图 → 预处理抠目标 → 裁剪 → 建模板(一次) → 循环读图 → 模板匹配 → 拿 Row/Column/Angle/Score → 显示或后续处理 → 释放模型。
+						例子
+*抓取张图片用于提取模板区域，创建模板
+* Image Acquisition 01: Code generated by Image Acquisition 01
+open_framegrabber ('MVision(2)', 1, 1, 0, 0, 0, 0, 'progressive', 8, 'default', -1, 'false', 'auto', 'GEV:DA4564987 MV-CU060-10GM', 0, -1, AcqHandle)
+grab_image_start (AcqHandle, -1)
+grab_image_async (Image, AcqHandle, -1)
+
+ *提取出目标区域
+    *进行阈值分割，提取出目标区域
+    threshold (Image, Regions, 0, 145)
+    *打散
+    connection (Regions, ConnectedRegions)
+    *选出目标区域
+    select_shape (ConnectedRegions, SelectedRegions, 'area', 'and', 20461.5, 44408.9)
+    *进行区域填充
+    fill_up ( SelectedRegions, RegionFillUp)
+    *提取目标区域
+    reduce_domain (Image, RegionFillUp, ImageReduced)
+    
+    *创建匹配模板
+    create_shape_model (ImageReduced, 'auto', rad(-10), rad(370), 'auto', 'auto', 'ignore_local_polarity', 'auto', 'auto', ModelID)
+    *获取模板轮廓
+    get_shape_model_contours (ModelContours, ModelID, 1)
+    
+    *获取窗口句柄
+    dev_get_window (WindowHandle)
+    dev_set_color ('green')
+    
+    *进入循环寻找模板
+    while(true)
+        grab_image_async (Image1, AcqHandle, -1)
+        *进行模板匹配
+        find_shape_model (Image1, ModelID, rad(-10), rad(370), 0.5, 1, 0.5, 'least_squares', 0, 0.9, Row, Column, Angle, Score)
+        if(Score>0.8)
+            *生成中心点
+            gen_cross_contour_xld (Cross, Row, Column, 50, Angle)
+            *显示坐标
+            dev_disp_text ('x='+Column+' '+'y='+Row, 'image', 1730, 800, 'black', [], [])
+            wait_seconds (1)
+        endif
+        
+    endwhile
+
+* Image Acquisition 01: Do something
+close_framegrabber (AcqHandle)
+-----------------------------------------------------------------------------------------
+    
+* #创建模版
+*     create_shape_model_xld (SelectedXLD, 'auto', rad(-20), rad(380), 'auto', 'auto', 'ignore_local_polarity', 5, ModelID)
+模式						含义				适用场景
+'use_polarity'				要求极性一致		光照稳定、目标与背景对比方向不变
+'ignore_global_polarity'	忽略全局极性		目标可能整体明暗反转
+'ignore_local_polarity'		忽略局部极性		局部光照变化、部分反光
+'ignore_color_polarity'		忽略颜色极性		彩色图像，颜色通道可能反转
+
+#提取模板轮廓
+    get_shape_model_contours (ModelContours, ModelID, 1)
+* #获取图像轮廓中心点坐标
+    get_shape_model_origin (ModelID, Row, Column)
+* #获取原始轮廓中心点
+*     area_center_xld (SelectedXLD, Area, Row1, Column1, PointOrder)
+    
+    find_shape_model (Image, ModelID,  rad(-20), rad(380), 0.5, 1, 0.5, 'least_squares', 0, 0.9, Row2, Column2, Angle, Score)
+    
+#进行仿射变换
+    if(Score>0.8)
+            vector_angle_to_rigid (Row, Column, 0, Row2, Column2, Angle, HomMat2D)
+            affine_trans_contour_xld (ModelContours, ContoursAffineTrans, HomMat2D)
+            gen_cross_contour_xld (Cross, Row2, Column2, 26, Angle)
+    endif
+
+#保存模版
+    write_shape_model (ModelID, 'C:/Users/20765/Desktop/1.shm/2.shm')
+   
+endwhile
+close_framegrabber (AcqHandle)
+
+#生成标定板描述文件   
+7, 7 : 这分别指定了标定板上X方向和Y方向的圆点数量    
+0.002 : 这是相邻两个圆点中心之间的距离   
+0.5 : 这是圆点直径与间距的比值
+gen_caltab (7, 7, 0.002, 0.5, 'C:/Users/20765/Desktop/50_50_2_4.descr', 'C:/Users/20765/Desktop/50_50_2_4caltab.ps')
+
+* 将两个圆心的像素坐标转换到世界坐标系（Z=0平面）
+image_points_to_world_plane (CameraParameters, CameraPose, Rows, Cols, 1, WorldRows, WorldCols)
+
+* 计算两个圆心在世界坐标系下的欧式距离（单位：毫米）
+DistanceMM := sqrt((WorldRows[0] - WorldRows[1]) * (WorldRows[0] - WorldRows[1]) + (WorldCols[0] - WorldCols[1]) * (WorldCols[0] - WorldCols[1]))
+
+--------------------------------------------------创建标定板的描述文件流程----------------------------------------------------------
+实物和标定板的厚度要一致：（添加实物厚度，更新外参描述文件）
+*读取内参描述文件
+read_cam_par ('C:/Users/20765/Desktop/cir.cal', CameraParam)
+*读取外参描述文件
+read_pose ('C:/Users/20765/Desktop/cir.dat', Pose)
+*添加实物厚度，更新外惨  参数：外参文件  DX  DY   标定板厚度+实物厚度   输出
+set_origin_pose (Pose, Pose[0], Pose[1], 0.0041, PoseNewOrigin)
+*更新外参描述文件
+write_pose (PoseNewOrigin, 'C:/Users/20765/Desktop/cir.dat')
+
+
+1.创建标定板的描述文件.cpd
+*创建圆的标定板的描述文件  7*7圆的个数   圆心之间的距离  圆的直径   
+gen_caltab (7, 7, 0.0125, 0.5, 'caltab.descr', 'caltab.ps')
+
+*创建蜂窝标定板的描述文件  参数: 行数, 列数, 圆点直径(米), 寻位标志行, 寻位标志列, 极性, 描述文件输出路径, 打印文件输出路径
+create_caltab(27, 31, 0.00258065, [13,6,6,20,20], [15,6,24,6,24], 'light_on_dark', 'calplate.cpd', 'calplate.ps') [citation:9]
+
+
+2.进行标定   标定误差<0.2就可以了
+
+3.读取标定文件 .cal内参  .dat外参
+*读取内参描述文件
+read_cam_par ('C:/Users/20765/Desktop/cir.cal', CameraParam)
+
+*读取外参描述文件
+read_pose ('C:/Users/20765/Desktop/cir.dat', Pose)
+
+4.进行区域提取，获得图像坐标
+5.奖图像坐标转换世界坐标
+6.计算世界坐标的距离
+
+
+--------------------------------------------------------------------测距方法--------------------------------------------------------
+* Measure 04: 初始化标定参数（已存在）
+CameraParameters := ['area_scan_division',0.00871463,-1578.14,2.40013e-06,2.4e-06,1514.09,1119.89,3072,2048]
+CameraPose := [-0.100768,-0.0745215,0.234029,0.557314,356.483,2.04008,0]
+
+* 读取图像
+read_image (Image, 'C:/Users/20765/Desktop/微信图片_20260827113542_231_121.bmp')
+dev_get_window (WindowHandle)
+dev_set_draw ('margin')
+dev_clear_window ()
+dev_display (Image)
+
+* 定义数组，用来存放两个圆心的像素坐标
+Rows := []
+Cols := []
+
+* 循环两次，画两个圆
+for Index := 1 to 2 by 1
+    * 提示用户画第几个圆
+    disp_message (WindowHandle, '请画第 ' + Index + ' 个圆（鼠标左键画圆，右键确认）', 'window', 12, 12, 'black', 'true')
+    
+    * 1. 手动绘制一个圆（近似）
+    draw_circle (WindowHandle, Row, Column, Radius)
+    gen_circle (Circle, Row, Column, Radius)
+    
+    * 2. 裁切出圆的区域，提高拟合精度
+    reduce_domain (Image, Circle, ImageReduced)
+    
+    * 3. 亚像素边缘提取（如果是彩色图用edges_color_sub_pix，否则用edges_sub_pix更稳定）
+    edges_sub_pix (ImageReduced, Edges, 'canny', 1, 20, 40)
+    
+    * 4. 将边缘点拟合成精确的圆，得到精确圆心（Row1, Column1）
+    fit_circle_contour_xld (Edges, 'algebraic', -1, 0, 0, 3, 2, Row1, Column1, Radius1, StartPhi, EndPhi, PointOrder)
+    
+    * 5. 在图像上标记这个精确圆心
+    gen_cross_contour_xld (Cross, Row1, Column1, 20, 0.785)
+    dev_display (Cross)
+    
+    * 6. 保存这个圆心的像素坐标到数组
+    Rows := [Rows, Row1]
+    Cols := [Cols, Column1]
+    
+    * 显示当前圆心位置（像素坐标）
+    disp_message (WindowHandle, '圆心 ' + Index + ' 像素坐标: (' + Row1$'.3f' + ', ' + Column1$'.3f' + ')', 'window', 30 + Index*30, 12, 'blue', 'false')
+endfor
+
+* =========== 关键步骤：像素坐标 → 世界坐标（毫米） ===========
+* 将两个圆心的像素坐标转换到世界坐标系（Z=0平面）
+image_points_to_world_plane (CameraParameters, CameraPose, Rows, Cols, 1, WorldRows, WorldCols)
+
+* 计算两个圆心在世界坐标系下的欧式距离（单位：毫米）
+DistanceMM := sqrt((WorldRows[0] - WorldRows[1]) * (WorldRows[0] - WorldRows[1]) + (WorldCols[0] - WorldCols[1]) * (WorldCols[0] - WorldCols[1]))
+
+* 在图像窗口最上方用大红字显示最终结果
+disp_message (WindowHandle, '★★★ 两个圆的圆心实际距离：' + DistanceMM$'.3f' + ' 毫米 ★★★', 'window', 0, 12, 'red', 'true')
+
+* 把距离值打印到控制台（变量窗口也能看到）
+
+
+
+#一维测量
+#生成一段圆弧去测量  中间的圆弧线
+gen_measure_arc (100, 100, 50, 0, 6.28318, 10, 512, 512, 'nearest_neighbor', MeasureHandle)
+#生成一个矩形来进行测量   中间的线段
+gen_measure_rectangle2 (300, 200, 0, 100, 20, 512, 512, 'nearest_neighbor', MeasureHandle1)
+*放回陈成对的距离
+measure_pairs (, MeasureHandle1, 1, 30, 'all', 'all', RowEdgeFirst, ColumnEdgeFirst, AmplitudeFirst, RowEdgeSecond, ColumnEdgeSecond, AmplitudeSecond, IntraDistance, InterDistance)
+*返回更多的测量距离
+measure_pos (, MeasureHandle1, 1, 30, 'all', 'all', RowEdge, ColumnEdge, Amplitude, Distance)
+measure_thresh (, MeasureHandle1, 1, 128, 'all', RowThresh, ColumnThresh, Distance)
+
+
+-----------------------------------------------------------------------------------------------------九点保定-------------------------------------------------------------------------------------------------------------------
+read_image (Biaoding, 'C:/Users/20765/Documents/xwechat_files/wxid_5b9qqkumh82m22_989d/msg/file/2026-09/技高Halcon视觉学习第十二天/技高Halcon视觉学习第十二天/九点标定/biaoding.tif')
+定义一个x，y的数组用于模拟记录物体的机械坐标
+
+*模拟机械坐标 标定9个点，中间点坐标5,5
+tuple_gen_const (9, 0, x)
+tuple_gen_const (9, 0, y)
+index := 0
+for i := 0 to 2 by 1
+    for j := 0 to 2 by 1
+        x[index] := j * 5
+        y[index] := i * 5
+        index := index + 1
+    endfor
+endfor
+
+循环提取每一个圆的像素坐标
+dev_get_window (WindowHandle)
+dev_set_draw ('margin')
+*定义两个数组用于每个圆的像素坐标
+cirow :=[]
+circol :=[]
+
+temp :=0
+while(temp<9)
+    *绘制圆
+    draw_circle (WindowHandle, Row, Column, Radius)
+    gen_circle (Circle, Row, Column, Radius)
+    *提取区域
+    reduce_domain (Biaoding, Circle, ImageReduced)
+    *寻找边缘
+    edges_sub_pix (ImageReduced, Edges, 'canny', 1, 20, 40)
+    *进行拟合
+    fit_circle_contour_xld (Edges, 'algebraic', -1, 0, 0, 3, 2, Row1, Column1, Radius1, StartPhi, EndPhi, PointOrder)
+    *生成圆心标记
+    gen_cross_contour_xld (Cross, Row1, Column1, 6, StartPhi)
+    *保存找到的找到的圆心
+    cirow :=[cirow,Row1]
+    circol :=[circol,Column1]
+    
+    temp :=temp+1
+    dev_display (Biaoding)
+endwhile
+*根据像素坐标与机械坐标关系，生产一个仿射变换矩阵 像素x，像素y，机械x，机械y
+vector_to_hom_mat2d (circol, cirow, x, y, HomMat2D)
+
+*打开文件用于保存仿射变换举证  用写模式打开
+open_file ('C:/Users/20765/Documents/xwechat_files/wxid_5b9qqkumh82m22_989d/msg/file/2026-09/技高Halcon视觉学习第十二天/技高Halcon视觉学习第十二天/九点标定/My_test/九点矩阵', 'output_binary', FileHandle)
+*将仿射变换举证进行序列
+serialize_hom_mat2d (HomMat2D, SerializedItemHandle)
+*写入文件
+fwrite_serialized_item (FileHandle, SerializedItemHandle)
+*关闭文件
+close_file (FileHandle)
+
+stop()
+
+* 下面进行测试  
+* 1.任意取一个圆，得到他的机械坐标
+* 2.去两个圆，得到他们之间的机械距离
+
+*反序列化文件，加载仿射二维变换矩阵‘
+*打开文件  用读文件模式
+open_file ('C:/Users/20765/Documents/xwechat_files/wxid_5b9qqkumh82m22_989d/msg/file/2026-09/技高Halcon视觉学习第十二天/技高Halcon视觉学习第十二天/九点标定/My_test/九点矩阵', 'input_binary', FileHandle1)
+*读取文件数据
+fread_serialized_item (FileHandle1, SerializedItemHandle1)
+*进行序列化加载
+deserialize_hom_mat2d (SerializedItemHandle1, HomMat2D1)
+*关闭文件
+close_file (FileHandle1)
+
+#随机取一个圆，获取他的机械坐标并且显示出来
+*绘制一个圆
+draw_circle (WindowHandle, Row2, Column2, Radius2)
+gen_circle (Circle1, Row2, Column2, Radius2)
+*提取区域
+reduce_domain (Biaoding, Circle1, ImageReduced1)
+*阈值分割提取边缘
+edges_sub_pix (ImageReduced1, Edges1, 'canny', 1, 20, 40)
+*拟合一个圆，获取像素圆心坐标
+fit_circle_contour_xld (Edges1, 'algebraic', -1, 0, 0, 3, 2, Row3, Column3, Radius3, StartPhi1, EndPhi1, PointOrder1)
+*标记圆心坐标
+gen_cross_contour_xld (Cross1, Row3, Column3, 16, StartPhi1)
+*将像素圆心坐标转换为机械坐标 ,进行仿射变换
+affine_trans_point_2d (HomMat2D1, Column3, Row3, Qx, Qy)
+*显示机械圆心坐标 叠加显示
+*设置坐标显示的位置
+* set_tposition (WindowHandle, Row3,Column3)
+*进行显示
+* write_string (WindowHandle, Qx$'.1'+' '+Qy$'.1')
+dev_disp_text (Qx$'.3'+' '+ Qy$'.3', 'image', Row3, Column3, 'black', [], [])
+
+stop()
+
+#任意取两个圆，计算两个圆的机械距离
+dev_display (Biaoding)
+*定一个四个数组，分别用于保存像素坐标的xy，以及转换后的机械坐标xy
+circlerow :=[]
+circlecol :=[]
+cirx :=[]
+ciry :=[]
+
+*for循环取两个圆
+for index :=0 to 1 by 1
+    *绘制第一个圆
+    draw_circle (WindowHandle, Row4, Column4, Radius4)
+    gen_circle (Circle2, Row4, Column4, Radius4)
+    *提取圆区域
+    reduce_domain (Biaoding, Circle2, ImageReduced2)
+    *提取边缘轮廓
+    edges_sub_pix (ImageReduced2, Edges2, 'canny', 1, 20, 40)
+    *进行拟合圆，提取像素坐标系圆心
+    fit_circle_contour_xld (Edges2, 'algebraic', -1, 0, 0, 3, 2, Row5, Column5, Radius5, StartPhi2, EndPhi2, PointOrder2)
+    *记录像素坐标系
+    circlerow :=[circlerow,Row5]
+    circlecol :=[circlecol,Column5]
+    
+endfor
+*将两个圆的圆心转为机械坐标 ，进行反射变换
+affine_trans_point_2d (HomMat2D1, circlecol,circlerow, cirx, ciry)
+
+
+*显示圆形坐标，并且连接起来
+gen_cross_contour_xld (Cross2, circlerow,circlecol, 16, StartPhi2)
+*生成直线 根据得到的两个点坐标，绘制一条线
+* disp_line (WindowHandle, circlerow[0], circlecol[0], circlerow[1], circlecol[1])
+* gen_region_line (RegionLines, circlerow[0], circlecol[0], circlerow[1], circlecol[1])
+gen_contour_polygon_xld (Contour, [circlerow[0], circlerow[1]], [circlecol[0], circlecol[1]])
+*在线段的中间显示出距离
+*计算线段的中点坐标（取平均值）
+MidRow := (circlerow[0] + circlerow[1]) / 2.0
+MidCol := (circlecol[0] + circlecol[1]) / 2.0
+
+*计算机械距离
+distance_pp (ciry[0], cirx[0], ciry[1], cirx[1], Distance)
+*显示文本
+dev_disp_text (Distance, 'image', MidRow, MidCol, 'black', [], [])
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+###########################################################################模本匹配+卡尺测量###################################################################
+* Image Acquisition 01: Code generated by Image Acquisition 01
+open_framegrabber ('MVision(2)', 1, 1, 0, 0, 0, 0, 'progressive', 8, 'default', -1, 'false', 'auto', '0', 0, -1, AcqHandle)
+grab_image_start (AcqHandle, -1)
+temp :=1
+while (true)
+    grab_image_async (Image, AcqHandle, -1)
+    * Image Acquisition 01: Do something
+    if (temp==1)
+        stop()
+    dev_get_window (WindowHandle)
+    dev_set_draw ('margin')
+    get_image_size (Image, Width, Height)
+    draw_rectangle1 (WindowHandle, Row1, Column1, Row2, Column2)
+    gen_rectangle1 (Rectangle, Row1, Column1, Row2, Column2)
+    *截取矩形区域作为模版
+    reduce_domain (Image, Rectangle, ImageReduced)
+    
+    *创建模版
+    create_shape_model (ImageReduced, 1, 0, rad(360), 'auto', 'auto', 'use_polarity', 25, 'auto', ModelID)
+    *显示模版 金字塔层数，对比度，要和创建模版一致
+    inspect_shape_model (ImageReduced, ModelImages, ModelRegions,1, 25)
+    *获取创建模版时的具体参数
+    get_shape_model_params (ModelID, NumLevels, AngleStart, AngleExtent, AngleStep, ScaleMin, ScaleMax, ScaleStep, Metric, MinContrast)
+    *在图像中寻找模版轮廓
+    find_shape_model (ModelImages, ModelID, AngleStart, AngleStart, 0.5, 1, 0.5, 'least_squares', 0, 0.9, Row, Column, Angle, Score)
+    *获取模版轮廓
+    get_shape_model_contours (ModelContours, ModelID, 1)
+*###########################################################创建测量模型###################################################
+    *绘制条直线
+    draw_line (WindowHandle, Row11, Column11, Row21, Column21)
+    gen_region_line (leftRegionLines, Row11, Column11, Row21, Column21)
+    
+    draw_line (WindowHandle, Row12, Column12, Row22, Column22)
+    gen_region_line (reghtRegionLines, Row12, Column12, Row22, Column22)
+    
+    draw_line (WindowHandle, Row14, Column14, Row24, Column24)
+    gen_region_line (RegionLines2, Row14, Column14, Row24, Column24)
+    
+    draw_line (WindowHandle, Row15, Column15, Row25, Column25)
+    gen_region_line (RegionLines3, Row15, Column15, Row25, Column25)
+    
+    *创建数组保存直线坐标
+*     rowbegin :=[]
+*     colbegin :=[]
+*     rowend :=[]
+*     colend :=[]
+    
+    *创建测量模版句柄
+    create_metrology_model (MetrologyHandle)
+    *设置图像大小
+    set_metrology_model_image_size (MetrologyHandle, Width, Height)
+    *将直线添加到测量模型中
+    *水平
+    line1 :=[Row11, Column11, Row21, Column21]
+    line2 :=[Row12, Column12, Row22, Column22]
+    
+    *垂直
+    line3 :=[Row14, Column14, Row24, Column24]
+    line4 :=[Row15, Column15, Row25, Column25]
+    
+    add_metrology_object_generic (MetrologyHandle, 'line', [line1,line2,line3,line4], 45, 5, 1, 20, [], [], Index)
+    *获得测量模型轮廓 'all'是指选取Index里面所有的模型 所有的直线
+    dev_set_color ('green')
+    *获得我绘制的测量直线
+    get_metrology_object_model_contour (modelContour, MetrologyHandle, 'all', 1.5)
+    dev_set_color ('red')
+    *获得测量区域
+    get_metrology_object_measures (measureContours, MetrologyHandle, 'all', 'all', Row3, Column3)
+    *设置参考系以原点为坐标
+    set_metrology_model_param (MetrologyHandle, 'reference_system', [Row, Column,0])
+    
+    *跳出模型创建
+    temp := temp +1
+    else
+*######################################开始测量##################################################
+    *设置区域填充模式
+    dev_set_draw ('fill')
+    *read_image (Image97d20dbc416db868140fa8db5b46c689, 'C:/Users/20765/Documents/xwechat_files/wxid_5b9qqkumh82m22_989d/temp/RWTemp/2026-09/90978d5e3881637c552155a997350c7b/97d20dbc416db868140fa8db5b46c689.bmp')
+    *显示图像
+    dev_display (Image)
+    *进行模版匹配
+    find_shape_model (Image, ModelID,  0, rad(360), 0.5, 1, 0.5, 'least_squares', 0, 0.9, Row4, Column4, Angle1, Score1)
+    *移动测量模版
+    align_metrology_model (MetrologyHandle, Row4, Column4, Angle1)
+    *进行测量并且拟合几何图形
+    apply_metrology_model (Image, MetrologyHandle)
+    *获得拟合出来的行列坐标
+    get_metrology_object_result (MetrologyHandle, Index, 'all', 'result_type', 'row_begin', RowBegin)
+    get_metrology_object_result (MetrologyHandle, Index, 'all', 'result_type', 'column_begin', ColBegin)
+    get_metrology_object_result (MetrologyHandle, Index, 'all', 'result_type', 'row_end', RowEnd)
+    get_metrology_object_result (MetrologyHandle, Index, 'all', 'result_type', 'column_end', ColEnd)
+    
+    *获得测量区域
+    get_metrology_object_measures (Contours, MetrologyHandle, 'all', 'all', Row5, Column5)
+    *获得与被测物拟合出来测量直线
+    get_metrology_object_result_contour (Measureline, MetrologyHandle, 'all', 'all', 1.5)
+    
+    *显示测量区域和测量轮廓
+    dev_set_color ('green')
+    dev_display (Contours)
+    dev_set_color ('red')
+    dev_display (Measureline)
+    stop()
+        
+*##################################################计算距离##############################################3
+    *生成两线之间的线段，并且显示距离
+    
+    *生成一个空的容器
+    gen_empty_obj (EmptyObject)
+    for i := 0 to 3 by 1
+        *生成边缘轮廓线
+        gen_region_line (RegionLines, RowBegin[i], ColBegin[i], RowEnd[i], ColEnd[i])
+        *累加到容器中
+        concat_obj (EmptyObject, RegionLines, EmptyObject)
+    endfor
+    
+    *选出直线
+    select_obj (EmptyObject, firstline, 1)
+    select_obj (EmptyObject, secondline, 2)
+    select_obj (EmptyObject, rightline, 3)
+    select_obj (EmptyObject, leftline, 4)
+    *计算两直线之间最小的距离
+    distance_rr_min (firstline, secondline, MinDistance, Row13, Column13, Row23, Column23)
+    distance_rr_min (rightline, leftline, MinDistance1, Row16, Column16, Row26, Column26)
+    *生直线
+    gen_region_line (RegionLines1, Row13, Column13, Row23, Column23)
+    gen_region_line (RegionLines4,  Row16, Column16, Row26, Column26)
+    *以文本的形式显示在图像的顶部
+    dev_set_color ('green')
+    set_tposition (WindowHandle, 600, 1500)
+    write_string (WindowHandle,  '垂直距离='+MinDistance+' '+'水平距离='+MinDistance1)
+    stop()
+    endif
+    *
+endwhile
+close_framegrabber (AcqHandle)
+
+
+###########################################利用halcon自带的助手实现深度学习##########################################################################
+read_image (Image887e2b1afb32ed677584bd1c4e66ab8e, 'C:/Users/20765/Documents/xwechat_files/wxid_5b9qqkumh82m22_989d/temp/RWTemp/2026-09/90978d5e3881637c552155a997350c7b/887e2b1afb32ed677584bd1c4e66ab8e.jpg')
+*绘制一个矩形
+dev_get_window (WindowHandle)
+
+draw_rectangle1 (WindowHandle, Row1, Column1, Row2, Column2)
+gen_rectangle1 (Rectangle, Row1, Column1, Row2, Column2)
+*截取区域
+reduce_domain (Image887e2b1afb32ed677584bd1c4e66ab8e, Rectangle, ImageReduced)
+rgb1_to_gray (ImageReduced, GrayImage)
+*阈值分割
+threshold (GrayImage, Regions, 18, 110)
+*进行膨胀
+dilation_rectangle1 (Regions, RegionDilation, 15, 1)
+*进行打散
+connection (RegionDilation, ConnectedRegions)
+count_obj (ConnectedRegions, Number)
+sort_region (ConnectedRegions, SortedRegions, 'character', 'true', 'column')
+
+*加载分类器
+read_ocr_class_mlp ('C:/Users/20765/Desktop/my.omc', OCRHandle)
+*进行识别
+for i :=1 to 5 by 1
+    select_obj (SortedRegions, ObjectSelected, i)
+    do_ocr_single_class_mlp (ObjectSelected, GrayImage, OCRHandle, 1, Class1, Confidence1)
+endfor
+
+do_ocr_word_mlp (SortedRegions, GrayImage, OCRHandle, Class1, 3, 2, Class, Confidence, Word, Score)
+
+
+###################################################创建函数接口##########################################
+read_image (Image, 'C:/Users/20765/Documents/xwechat_files/wxid_5b9qqkumh82m22_989d/temp/RWTemp/2026-09/90978d5e3881637c552155a997350c7b/367da68c8678fd574448433413c52445.png')
+*读取ocr文件
+read_ocr_class_mlp ('C:/Users/20765/AppData/Local/Programs/MVTec/HALCON-23.05-Progress/ocr/Industrial_Rej.omc', OCRHandle)
+
+Omcobject (Image, Region, OCRHandle, result)
+————————————————————————————————————————————————————————————-————
+“
+                                                             "阈值分割“i”和“j”的思路：平移+膨胀+交集+合并点与主体"
+1.垂直向下平移上面的点到主体部分的中心
+*向下平移15个像素
+move_region (SelectedRegions1, RegionMoved, 25, 0)
+
+2.进行矩形膨胀覆盖主体部分
+*将点膨胀之后包裹主体
+dilation_rectangle1 (RegionMoved, RegionDilation, 17, 30)
+
+3.利用膨胀的矩形区域，与打散之后的区域，进行取交集
+*求交集
+intersection (RegionDilation, ConnectedRegions, RegionIntersection)
+
+4.进行点的集合和主体的集合进行合并
+“i”
+ select_obj (SelectedRegions1, ObjectSelected, 1)
+ select_obj (RegionIntersection, ObjectSelected1, 1)
+ union2 (ObjectSelected, ObjectSelected1, RegionUnion3)
+ 
+“j”
+select_obj (SelectedRegions1, ObjectSelected2, 2)
+select_obj (RegionIntersection, ObjectSelected3, 2)
+union2 (ObjectSelected2, ObjectSelected3, RegionUnion4)
+”
+——————————————————————————————————————————————————————————————
+
+*进行二进制阈值分割
+binary_threshold (Image, Region, 'max_separability', 'dark', UsedThreshold)
+
+*打散
+connection (Region, ConnectedRegions)
+*进行圆度选择
+select_shape (ConnectedRegions, SelectedRegions3, 'area', 'and', 11.08, 500)
+union1 (SelectedRegions3, RegionUnion5)
+
+select_shape (SelectedRegions3, SelectedRegions, 'circularity', 'and', 0.506, 1)
+select_shape (SelectedRegions, SelectedRegions1, 'row', 'and', 0, 27.64)
+
+*向下平移15个像素
+move_region (SelectedRegions1, RegionMoved, 25, 0)
+*将点膨胀之后包裹主体，求交集
+dilation_rectangle1 (RegionMoved, RegionDilation, 17, 30)
+*求交集
+intersection (RegionDilation, ConnectedRegions, RegionIntersection)
+*进行连接
+union1 (SelectedRegions1, RegionUnion1)
+union1 (RegionIntersection, RegionUnion2)
+union2 (SelectedRegions1, RegionIntersection, RegionUnion)
+
+ difference ( RegionUnion5, RegionUnion, RegionDifference)
+ connection (RegionDifference, ConnectedRegions1)
+ 
+ select_obj (SelectedRegions1, ObjectSelected, 1)
+ select_obj (RegionIntersection, ObjectSelected1, 1)
+ union2 (ObjectSelected, ObjectSelected1, RegionUnion3)
+ 
+select_obj (SelectedRegions1, ObjectSelected2, 2)
+select_obj (RegionIntersection, ObjectSelected3, 2)
+union2 (ObjectSelected2, ObjectSelected3, RegionUnion4)
+ 
+concat_obj (ConnectedRegions1, RegionUnion3, ObjectsConcat)
+concat_obj (ObjectsConcat, RegionUnion4, ObjectsConcat1)
+
+*进行整理
+sort_region (ObjectsConcat1, SortedRegions, 'character', 'true', 'row')
+count_obj (SortedRegions, Number)
+*选出来后进行全部识别
+do_ocr_word_mlp (SortedRegions, Image, handle, '', 3, 2, Class, Confidence, Word, Score)
+
+return ()
+################################################################################################
+----------凹痕提取----------------------------
+* 核心代码：频域去背景 + 线条提取
+read_image (Image, 'D:/1.png')
+decompose3 (Image, R, G, B)          * 取B通道（可根据需要改为R或G）
+get_image_size (B, Width, Height)
+
+* 根据线宽和对比度计算高斯参数
+calculate_lines_gauss_parameters (43.5, [25,5], Sigma, Low, High)
+
+* 频域低通滤波估计背景
+fft_generic (B, ImageFFT, 'to_freq', -1, 'none', 'dc_center', 'complex')
+gen_gauss_filter (ImageGauss, 100, 100, 0, 'n', 'dc_center', Width, Height)
+convol_fft (ImageFFT, ImageGauss, ImageConvol)
+fft_generic (ImageConvol, ImageFFT1, 'from_freq', 1, 'none', 'dc_center', 'byte')
+
+* 原图减背景，增强线条
+sub_image (B, ImageFFT1, ImageSub, 2, 100)
+
+* 提取亚像素线条
+lines_gauss (ImageSub, Lines, Sigma, Low, High, 'dark', 'true', 'gaussian', 'true')
+
+* （可选）显示结果
+dev_display (B)
+dev_display (Lines)
+#############################################################################
+
+############深度学习#########################
+dev_get_window (WindowHandle)
+*读取模型
+read_dl_model ('C:/Users/20765/Desktop/model_训练-260910-172150_opt.hdl', DLModelHandle)
+*读取数据集
+read_dict ('C:/Users/20765/Desktop/model_训练-260910-172150_opt_dl_preprocess_params.hdict', [], [], DictHandle)
+*获取图片数据列表
+list_image_files ('C:/Users/20765/Desktop/测试图片', 'default', [], ImageFiles)
+*随机打乱顺序
+tuple_shuffle (ImageFiles, Shuffled)
+*查询可用的深度学习设备
+query_available_dl_devices ([], [], DLDeviceHandles)
+*接收cpu设备
+cpu:=DLDeviceHandles[0]
+
+*设置模型参数
+set_dl_model_param (DLModelHandle, 'batch_size', 16)
+*设置模型处理 核心
+set_dl_model_param (DLModelHandle, 'device', cpu)
+
+*设置显示颜色
+dev_set_color ('yellow')
+
+*for循环识别数据集
+for i :=0 to |ImageFiles|-1 by 1
+    *读取数据
+    read_image (Image,  Shuffled[i])
+    *将读取到的图像，存储到生成元组中去
+    gen_dl_samples_from_images (Image, DLSampleBatch)
+    *对图像进行预处理
+    preprocess_dl_samples (DLSampleBatch, DictHandle)
+    *进行模型推理识别图像
+    apply_dl_model (DLModelHandle, DLSampleBatch, [], DLResultBatch)
+    *获取推理后的结果
+    get_dict_tuple (DLResultBatch, 'classification_class_names', food)
+    get_dict_tuple (DLResultBatch, 'classification_confidences', score)
+    *判断自信度输出结果
+    if(score[0]>0.9)
+        *显示结果
+        set_tposition (WindowHandle, 24, 120)
+        write_string (WindowHandle,food[0])
+    else
+        write_string (WindowHandle, '请进行人工筛选该产品')
+    endif
+    wait_seconds(1)
+    
+    
+    
+endfor
+#################################################################################            
+
+#######################################识别药片##################################
+*读取模型
+read_dl_model ('C:/Users/20765/Desktop/Pill_model_.hdl', DLModelHandle)
+*读取元组数据
+read_dict ('C:/Users/20765/Desktop/Pill_model__dl_preprocess_params.hdict', [], [], DictHandle)
+
+*获取测试数据集列表
+list_image_files ('C:/Users/20765/Desktop/pill_image', 'default', [], ImageFiles)
+*将数据进行打乱
+tuple_shuffle (ImageFiles, Shuffled)
+
+*查询可用的设备
+query_available_dl_devices ([], [], DLDeviceHandles)
+cpu := DLDeviceHandles[0]
+
+*设置模型参数
+set_dl_model_param (DLModelHandle, 'batch_size', 20)
+set_dl_model_param (DLModelHandle, 'device', cpu)
+
+*获取句柄
+dev_get_window (WindowHandle)
+*设置颜色
+dev_set_color ('yellow')
+
+*for循环提取测试数据进行识别
+for i := 0 to |ImageFiles|-1 by 1
+    *读取图片
+    read_image (Image, Shuffled[i])
+    *将图片存储到生成的元组上去
+    gen_dl_samples_from_images (Image, DLSampleBatch)
+    *对图像进行预处理
+    preprocess_dl_samples (DLSampleBatch, DictHandle)
+    *执行识别
+    apply_dl_model (DLModelHandle, DLSampleBatch, [], DLResultBatch)
+    *获取数据
+    get_dict_tuple (DLResultBatch,'classification_confidences', score)
+    get_dict_tuple (DLResultBatch, 'classification_class_names', NGorOK)
+    
+    *if进行判断
+    if(score[0] >0.9)
+        set_tposition (WindowHandle, 24, 12)
+        write_string (WindowHandle,NGorOK[0] )
+    else
+        write_string (WindowHandle,'识别不出，请人工筛选')
+    endif
+    wait_seconds (1)
+endfor
+
+#####################################################################################                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+

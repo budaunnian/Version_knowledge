@@ -1,0 +1,319 @@
+;--------------------------------------------------------------------------------------;
+;                                                                                      ;
+;   This file contains installation information	for usb camera drivers.                ;
+;                                                                                      ;
+;--------------------------------------------------------------------------------------;
+[Version]
+signature="$CHICAGO$"
+Class=Image
+ClassGUID={6bdd1fc6-810f-11d0-bec7-08002be2092f}
+Provider=%Provider%
+DriverVer = 08/19/2019,2.9.8.2001
+CatalogFile=usbcam_generic.cat
+
+[ControlFlags]
+ExcludeFromSelect=*
+
+[Manufacturer]
+%ManufacturerMfg%=OEM,ntamd64
+
+;------------------------------------------------------------------------------
+; File sections
+;------------------------------------------------------------------------------
+
+[SourceDisksNames]
+1=%Disc1%
+
+[SourceDisksFiles.amd64]
+usbcam_298.sys=1
+drvcoinst2.dll=1
+
+[DestinationDirs]
+DRV_CopyDrivers=12
+CoInstaller_CopyFiles=11
+
+[DRV_CopyDrivers]
+%DriverFilename%
+ 
+;------------------------------------------------------------------------------
+; DDInstall sections
+;------------------------------------------------------------------------------
+
+[OEM.ntamd64]
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8101&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8102&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8201&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8202&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8203&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8204&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8205&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8206&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8207&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8208&MI_00
+
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8209&MI_00
+
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_0109&MI_00   ; ECO Cam
+%DeviceDescString%=UVC_Device,USB\VID_05A3&PID_9520&MI_00   ; HD USB Camera
+
+; uvc mode
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8302&MI_00   ; 21AUC
+
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8307&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8308&MI_00
+
+; USB3 default (no lens) cams, PID_84xy, x:= mono=0,color=1 | 0x4 ^= no i/o y:=sensor
+; Mono, all possible sensors
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8401&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8402&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8403&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8404&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8405&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8406&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8407&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8408&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8409&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_840A&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_840B&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_840C&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_840D&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_840E&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_840F&MI_00
+; Color, all possible sensors
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8411&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8412&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8413&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8414&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8415&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8416&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8417&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8418&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8419&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_841A&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_841B&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_841C&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_841D&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_841E&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_841F&MI_00
+
+; no i/o variants, mono, all sensors
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8441&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8442&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8443&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8444&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8445&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8446&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8447&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8448&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8449&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_844A&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_844B&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_844C&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_844D&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_844E&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_844F&MI_00
+; no i/o variants, color, all sensors
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8451&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8452&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8453&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8454&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8455&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8456&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8457&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8458&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8459&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_845A&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_845B&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_845C&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_845D&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_845E&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_845F&MI_00
+
+; USB3 auto focus cams, PID_85xy, x:= mono=0,color=1 | 0x4 ^= no i/o y:=sensor
+; Mono, all possible sensors
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8501&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8502&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8503&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8504&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8505&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8506&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8507&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8508&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8509&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_850A&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_850B&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_850C&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_850D&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_850E&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_850F&MI_00
+; Color, all possible sensors
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8511&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8512&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8513&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8514&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8515&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8516&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8517&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8518&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8519&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_851A&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_851B&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_851C&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_851D&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_851E&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_851F&MI_00
+
+; USB3 5X zoom cams, PID_86xy, x:= mono=0,color=1 | 0x4 ^= no i/o y:=sensor
+; Mono, all possible sensors
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8601&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8602&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8603&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8604&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8605&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8606&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8607&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8608&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8609&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_860A&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_860B&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_860C&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_860D&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_860E&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_860F&MI_00
+; Color, all possible sensors
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8611&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8612&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8613&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8614&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8615&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8616&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8617&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8618&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8619&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_861A&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_861B&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_861C&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_861D&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_861E&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_861F&MI_00
+
+; USB3 [placeholder, unknown next lens type] cams, PID_87xy, x:= mono=0,color=1 | 0x4 ^= no i/o y:=sensor
+; Mono, all possible sensors
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8701&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8702&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8703&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8704&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8705&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8706&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8707&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8708&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8709&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_870A&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_870B&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_870C&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_870D&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_870E&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_870F&MI_00
+; Color, all possible sensors
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8711&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8712&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8713&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8714&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8715&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8716&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8717&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8718&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8719&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_871A&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_871B&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_871C&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_871D&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_871E&MI_00
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_871F&MI_00
+
+; vendor specific
+%DeviceDescString%=UVC_Device,USB\VID_199E&PID_8916&MI_00
+
+;------------------------------------------------------------------------------
+; Videocapture sections
+;------------------------------------------------------------------------------
+
+[UVC_Device.NTamd64]
+Include=    ks.inf, kscaptur.inf
+Needs=      KS.Registration,KSCAPTUR.Registration.NT
+AddReg=     UVC_AddReg
+CopyFiles=  DRV_CopyDrivers
+
+[UVC_AddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,%DriverFilename%
+HKR,,PageOutWhenUnopened,3,01
+HKR,,DontSuspendIfStreamsAreRunning,3,01
+HKR,,OkToHibernate,3,01
+
+;------------------------------------------------------------------------------
+; Interface sections
+;------------------------------------------------------------------------------
+
+[UVC_Device.NTamd64.Interfaces]
+AddInterface=%KSCATEGORY_CAPTURE%,"GLOBAL",UVC_VideoCapture,
+
+[UVC_VideoCapture]
+AddReg=UVC_VideoCapture_AddReg
+
+[UVC_VideoCapture_AddReg]
+HKR,,CLSID,,{17CCA71B-ECD7-11D0-B908-00A0C9223196}
+HKR,,FriendlyName,,%CaptureFilterName%
+
+;------------------------------------------------------------------------------
+; Service sections
+;------------------------------------------------------------------------------
+
+[UVC_Device.NTamd64.Services]
+AddService=UVC,0x00000002,UVC_ServiceInstall
+
+[UVC_ServiceInstall]
+ServiceType   = %SERVICE_KERNEL_DRIVER%
+StartType     = %SERVICE_DEMAND_START%
+ErrorControl  = %SERVICE_ERROR_NORMAL%
+ServiceBinary = %12%\%DriverFilename%
+
+;------------------------------------------------------------------------------
+; CoInstaller sections
+;------------------------------------------------------------------------------
+[UVC_Device.NTamd64.CoInstallers]
+AddReg=CoInstaller_AddReg
+CopyFiles=CoInstaller_CopyFiles
+
+; we set this to "ignore when already there"
+[CoInstaller_CopyFiles]
+%CoInstallerFilename%,,,0x10
+
+[CoInstaller_AddReg]
+HKR,,CoInstallers32,0x00010000,"%CoInstallerFilename%,DRVCoInstaller"
+
+;------------------------------------------------------------------------------
+; String sections
+;------------------------------------------------------------------------------
+
+
+[Strings]
+Provider				= "The Imaging Source Europe GmbH"
+ManufacturerMfg			= "The Imaging Source Europe GmbH"
+DeviceDescString		= "TIS UVC Device"
+CaptureFilterName   	= "TIS UVC Device"
+
+Disc1					= "Installation Directory"
+
+DriverFilename 			= "usbcam_298.sys"
+
+CoInstallerFilename 		= "drvcoinst2.dll"
+
+KSCATEGORY_CAPTURE="{65E8773D-8F56-11D0-A3B9-00A0C9223196}"
+
+RunOnce = "SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce"
+
+SERVICE_KERNEL_DRIVER=1
+SERVICE_AUTO_START=2
+SERVICE_ERROR_NORMAL=1
+SERVICE_DEMAND_START=3
