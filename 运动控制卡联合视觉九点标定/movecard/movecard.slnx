@@ -1,0 +1,9 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+  </Configurations>
+  <Project Path="movecard/movecard.csproj" Id="44a108e4-db00-4a61-add0-3342e54de875">
+    <Platform Solution="*|x64" Project="x64" />
+  </Project>
+</Solution>
