@@ -18,6 +18,7 @@ using static MultiCardCS.MultiCardCS;
 using static System.Windows.Forms.AxHost;
 using H = HalconDotNet.HOperatorSet;
 
+
 namespace movecard
 {
     public partial class Form1 : Form
@@ -34,6 +35,7 @@ namespace movecard
         HTuple FileHandle1 = new HTuple(), SerializedItemHandle2=new HTuple();
         HTuple hv_FileHandle1 = new HTuple(), hv_HomMat2D1 = new HTuple(), hv_SerializedItemHandle2=new HTuple();
         HTuple qx =new HTuple(),qy=new HTuple();
+        
 
         public struct Point5D
         {
@@ -983,7 +985,7 @@ namespace movecard
         //进行点位映射
         private async void to_qpoint_Click(object sender, EventArgs e)
         {
-            await Task.Run(()=>point_mapping(49, 160));
+            await Task.Run(()=>point_mapping(372, 114));
         }
         //保存拍照位置
         private void button5_Click(object sender, EventArgs e)
@@ -1091,6 +1093,80 @@ namespace movecard
             });
             
         }
+        //绘制图形
+        private async void button10_Click(object sender, EventArgs e)
+        {
+            HTuple hv_Row, hv_Col;
+            HOperatorSet.ReadTuple("C:/Users/20765/Desktop/sorted_row.tup", out hv_Row);
+            HOperatorSet.ReadTuple("C:/Users/20765/Desktop/sorted_col.tup", out hv_Col);
+
+            double[] rows = hv_Row.ToDArr();   // 行坐标（y 方向）
+            double[] cols = hv_Col.ToDArr();   // 列坐标（x 方向）
+            
+            hv_Row.Dispose();
+            hv_Col.Dispose();
+
+            if (rows.Length == 0)
+            {
+                MessageBox.Show("未检测到有效轮廓，请检查图像/阈值");
+                return;
+            }
+
+            // 3. 后台线程逐点运动，避免卡 UI
+            await Task.Run(() =>
+            {
+                var path = new List<Point5D>();
+                HTuple drawqx = new HTuple(), drawqy = new HTuple();
+                for (int i = 0; i < rows.Length; i++)
+                {
+                    H.AffineTransPoint2d(hv_HomMat2D1, cols[i], rows[i], out drawqx, out drawqy);
+                    path.Add(new Point5D { X = drawqx, Y = drawqy });
+                }// 记得先过仿射变换
+                LineInterpolationPath(path, true);
+            });
+
+        }
+        private bool LineInterpolationPath(List<Point5D> path, bool iswait = true)
+        {
+            // ===== ★ 只加这一段：进入前把状态停干净 =====
+            short st = 0, fifo = 0;
+            int sg = 0;
+            card.GA_CrdStatus(1, ref st, ref sg, fifo);
+            if (st != 0)   // 有 running 标志
+            {
+                card.GA_Stop(0x0003, 0x0003);
+                var sw = Stopwatch.StartNew();
+                while (sw.ElapsedMilliseconds < 2000)
+                {
+                    card.GA_CrdStatus(1, ref st, ref sg, fifo);
+                    if (st == 0) break;
+                    Thread.Sleep(5);
+                }
+            }
+            // ===== 加完 =====
+
+            Create_xyz();
+            card.GA_CrdClear(1, 0);
+            int segNum = 0;
+            card.GA_AxisOn(1);
+            card.GA_AxisOn(2);
+
+            const double vel = 100, acc = 0.5;
+
+            foreach (var p in path)
+            {
+                int pulse_x = (int)MmConvertPulse(p.X);
+                int pulse_y = (int)MmConvertPulse(p.Y);
+                ret = card.GA_LnXY(1, pulse_x, pulse_y, vel, acc, 0, 0, segNum);
+                if (ret != 0) return false;
+                segNum++;
+            }
+
+            ret = card.GA_CrdData(1, 0, 0);
+            ret = card.GA_CrdStart(1, 0);
+            return WaitCoordRunFinish(iswait);
+        }
+
 
         //以当前位置为起点运动到指定点位
         private void point_move(double x,double y)
